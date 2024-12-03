@@ -97,20 +97,24 @@ class Movement:
 		cell = None
 		flag = False
 
-		frontier = PriorityQueue(self.grid.size, lambda x: dist[x], src_cell)
-		while frontier:
-			cell = frontier.dequeue()
+		frontier = PriorityQueue()
+		frontier.enqueue(dist[src_cell], src_cell)
+		# print(len(frontier)>0)
+		while len(frontier)>0:
+			_, cell = frontier.dequeue()
+			# print(cell)
 			visited[cell] = True
 			if cell == dest_cell:
 				flag = True
 				break
 
-			for i in self.grid.grid[cell]:
-				if not visited[i]:
-					dist[i] = dist[cell] + i.weight
-					frontier.compare_func = lambda x: dist[x]
-					pred[i] = cell
-					frontier.enqueue(i)
+			for ngb in self.grid.grid[cell]:
+				if not visited[ngb] and dist[ngb] > dist[cell] + ngb.weight:
+					# print(ngb)
+					dist[ngb] = dist[cell] + ngb.weight
+					frontier.compare_func = dist
+					pred[ngb] = cell
+					frontier.enqueue(dist[ngb], ngb)
 		path = []
 		if flag:
 			while cell:
@@ -121,27 +125,34 @@ class Movement:
 		return path
 
 	def __a_star(self, src_cell: Cell, dest_cell: Cell, pred: Dict[Cell, Cell]):
+		def cost_function(cell1):
+			return dist[cell1] + manhattan_distance(cell1, dest_cell)
+
 		def manhattan_distance(cell1, cell2):
 			return math.fabs(cell1.x - cell2.x) + math.fabs(cell1.y - cell2.y)
 
-		visited = dict()
+		visited, dist = dict(), dict()
 		for k in self.grid.items():
 			visited[k] = False
+			dist[k] = 1e7
+		dist[src_cell] = 0
 		cell = None
 		flag = False
 
-		frontier = PriorityQueue(self.grid.size, lambda x: x.weight + manhattan_distance(x, dest_cell), src_cell)
+		frontier = PriorityQueue()
+		frontier.enqueue(cost_function(src_cell), src_cell)
 		while frontier:
-			cell = frontier.dequeue()
+			_,cell = frontier.dequeue()
 			visited[cell] = True
 			if cell == dest_cell:
 				flag = True
 				break
 
-			for i in self.grid.grid[cell]:
-				if not visited[i]:
-					pred[i] = cell
-					frontier.enqueue(i)
+			for ngb in self.grid.grid[cell]:
+				if not visited[ngb] and dist[ngb] > dist[cell] + ngb.weight:
+					dist[ngb] = dist[cell] + ngb.weight
+					pred[ngb] = cell
+					frontier.enqueue(cost_function(ngb), ngb)
 		path = []
 		if flag:
 			while cell:
@@ -156,5 +167,6 @@ if __name__ == '__main__':
 	grid = Grid(10)
 	move = Movement(grid)
 
-	print(move.shortest_path(2, 53, 2))
+	for i in move.shortest_path((0,2), (5, 3), 3):
+		print(i)
 	# move.shortest_path(2, 53, 3)

@@ -50,7 +50,7 @@ while running:
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			mouse_x, mouse_y = event.pos
 			dest_cell = (mouse_x // CELL_SIZE, mouse_y // CELL_SIZE)
-			path_gen = move.shortest_path((src_cell[1], src_cell[0]), dest_cell)
+			path_gen = move.shortest_path((src_cell[1], src_cell[0]), dest_cell, mode=2)
 			highlighted_cells = []
 			dest_set = True
 
