@@ -7,7 +7,7 @@ class Movement:
 	def __init__(self, grid:Grid):
 		self.grid = grid
 
-	def shortest_path(self, src: tuple, dest: tuple, mode:int=0):
+	def shortest_path(self, src: tuple, dest: tuple, mode:int=3):
 		src_cell, dest_cell = self.grid.get(src), self.grid.get(dest)
 		print(src_cell, dest_cell)
 		path = []
@@ -163,10 +163,10 @@ class Movement:
 		return path
 
 
-if __name__ == '__main__':
-	grid = Grid(10)
-	move = Movement(grid)
-
-	for i in move.shortest_path((0,2), (5, 3), 3):
-		print(i)
-	# move.shortest_path(2, 53, 3)
+# if __name__ == '__main__':
+# 	grid = Grid(10)
+# 	move = Movement(grid)
+#
+# 	for i in move.shortest_path((0,2), (5, 3), 3):
+# 		print(i)
+# 	# move.shortest_path(2, 53, 3)

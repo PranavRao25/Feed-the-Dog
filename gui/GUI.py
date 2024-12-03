@@ -12,6 +12,7 @@ class Colors:
 	RED = (255, 0, 0)
 	BLACK = (0, 0, 0)
 	GREEN = (0, 255, 0)
+	ORANGE = (255, 165, 0)
 	YELLOW = (255, 255, 0)  # to do: increasing gradient
 
 
@@ -35,10 +36,14 @@ pygame.display.set_caption("Stardew Navigation")
 
 # Track highlighted cells
 highlighted_cells = []
+complete_path = []
 dest_set = False
 dest_cell = None
 src_cell = [0, 0]
 path_gen = None
+player_pos = src_cell.copy()
+player_speed = 5
+next_hop = None
 
 # Game loop
 running = True
@@ -50,9 +55,10 @@ while running:
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			mouse_x, mouse_y = event.pos
 			dest_cell = (mouse_x // CELL_SIZE, mouse_y // CELL_SIZE)
+			dest_set = True
 			path_gen = move.shortest_path((src_cell[1], src_cell[0]), dest_cell, mode=2)
 			highlighted_cells = []
-			dest_set = True
+			complete_path = []
 
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_DOWN and src_cell[0] < ROWS - 1:
@@ -72,12 +78,21 @@ while running:
 		path_gen = move.shortest_path((src_cell[1], src_cell[0]), dest_cell)
 		highlighted_cells = []
 
+	if next_hop:
+		player_pos = next_hop
+		player_target = highlighted_cells.pop(0) if highlighted_cells else None
+	elif highlighted_cells:
+		next_hop = highlighted_cells.pop()
+
 	if path_gen:
 		try:
 			highlighted_cell = next(path_gen)
 			highlighted_cells.append(highlighted_cell)
+			complete_path.append(highlighted_cell)
 		except StopIteration:
 			path_gen = None
+			src_cell = dest_cell[1], dest_cell[0]
+			complete_path = []
 
 	# Draw grid
 	screen.fill(Colors.WHITE)
@@ -88,6 +103,8 @@ while running:
 				color = Colors.RED
 			elif grid.get((col, row)) in highlighted_cells:
 				color = Colors.YELLOW
+			elif grid.get((col, row)) in complete_path:
+				color = Colors.ORANGE
 			else:
 				color = Colors.GRAY
 
@@ -104,7 +121,7 @@ while running:
 	# Update display
 	pygame.display.flip()
 
-	sleep(0.1)
+	sleep(0.2)
 
 # Quit Pygame
 pygame.quit()
