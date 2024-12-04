@@ -3,6 +3,7 @@ from typing import Dict, List
 from app.Layout import *
 from app.DataStructures import PriorityQueue
 
+
 class Movement:
 	def __init__(self, grid:Grid):
 		self.grid = grid
