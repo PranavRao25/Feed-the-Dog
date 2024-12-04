@@ -1,6 +1,7 @@
 import pygame
 import sys
 import asyncio
+import os
 from time import sleep
 from app.Movement import Movement
 from app.Layout import Grid
@@ -17,6 +18,18 @@ CELL_SIZE = WIDTH // 10  # Size of each grid cell
 ROWS, COLS = HEIGHT // CELL_SIZE, WIDTH // CELL_SIZE
 clock = pygame.time.Clock()
 
+def resource_path(relative_path):
+    """
+    Get the absolute path to a resource.
+    Works for both PyInstaller and development environments.
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")  # Base path in development
+
+    return os.path.join(base_path, relative_path)
 
 class Colors:
     WHITE = (255, 255, 255)
@@ -71,7 +84,7 @@ async def main():
     path_gen = None
     player_pos = src_cell.copy()
     next_hop = None
-    player = Player(player_pos[0], player_pos[1], "gui/files/dog.png", 2, CELL_SIZE)
+    player = Player(player_pos[0], player_pos[1], resource_path("gui/files/dog.png"), 2, CELL_SIZE)
     all_sprites.add(player)
     dest_tile = None
     
@@ -89,7 +102,7 @@ async def main():
                 
                 mouse_x, mouse_y = event.pos
                 dest_cell = [mouse_x // CELL_SIZE, mouse_y // CELL_SIZE]
-                dest_tile = DestTile(dest_cell[0], dest_cell[1], "gui/files/bone.jpeg")
+                dest_tile = DestTile(dest_cell[0], dest_cell[1], resource_path("gui/files/bone.jpeg"))
                 all_sprites.add(dest_tile)
                 
                 dest_set = True
